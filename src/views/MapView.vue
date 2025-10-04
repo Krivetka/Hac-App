@@ -16,7 +16,11 @@
             class="search-input"
           />
           <transition name="fade">
-            <div v-if="showFromSuggestions && fromSuggestions.length" class="suggestions-dropdown">
+            <div v-if="showFromSuggestions && (fromSuggestions.length || isLoadingFrom)" class="suggestions-dropdown">
+              <div v-if="isLoadingFrom" class="suggestion-loading">
+                <div class="loader"></div>
+                <span>Wyszukiwanie...</span>
+              </div>
               <div 
                 v-for="stop in fromSuggestions" 
                 :key="stop.id"
@@ -24,19 +28,13 @@
                 @mousedown.prevent="selectFromStop(stop)"
               >
                 <div class="suggestion-icon">
-                  <svg v-if="stop.type === 'tram'" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M19 16.94V8.5c0-2.79-2.61-3.4-6.01-3.49l.76-1.51H17V2H7v1.5h4.75l-.76 1.52C7.86 5.11 5 5.73 5 8.5v8.44c0 1.45 1.19 2.66 2.59 2.97L6 21.5v.5h2.23l2-2H14l2 2h2v-.5L16.5 20h-.08c1.69 0 2.58-1.37 2.58-3.06zm-7 1.56c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm5-4.5H7V9h10v5z"/>
-                  </svg>
-                  <svg v-else viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M4 16c0 .88.39 1.67 1 2.22V20c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h8v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1.78c.61-.55 1-1.34 1-2.22V6c0-3.5-3.58-4-8-4s-8 .5-8 4v10zm3.5 1c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm9 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6H6V6h12v5z"/>
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
                   </svg>
                 </div>
                 <div class="suggestion-content">
                   <div class="suggestion-name">{{ stop.name }}</div>
-                  <div class="suggestion-lines">
-                    <span v-for="line in stop.lines.slice(0, 5)" :key="line" class="line-badge">{{ line }}</span>
-                    <span v-if="stop.lines.length > 5" class="more-lines">+{{ stop.lines.length - 5 }}</span>
-                  </div>
                 </div>
               </div>
             </div>
@@ -56,7 +54,11 @@
             class="search-input"
           />
           <transition name="fade">
-            <div v-if="showToSuggestions && toSuggestions.length" class="suggestions-dropdown">
+            <div v-if="showToSuggestions && (toSuggestions.length || isLoadingTo)" class="suggestions-dropdown">
+              <div v-if="isLoadingTo" class="suggestion-loading">
+                <div class="loader"></div>
+                <span>Wyszukiwanie...</span>
+              </div>
               <div 
                 v-for="stop in toSuggestions" 
                 :key="stop.id"
@@ -64,19 +66,13 @@
                 @mousedown.prevent="selectToStop(stop)"
               >
                 <div class="suggestion-icon">
-                  <svg v-if="stop.type === 'tram'" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M19 16.94V8.5c0-2.79-2.61-3.4-6.01-3.49l.76-1.51H17V2H7v1.5h4.75l-.76 1.52C7.86 5.11 5 5.73 5 8.5v8.44c0 1.45 1.19 2.66 2.59 2.97L6 21.5v.5h2.23l2-2H14l2 2h2v-.5L16.5 20h-.08c1.69 0 2.58-1.37 2.58-3.06zm-7 1.56c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm5-4.5H7V9h10v5z"/>
-                  </svg>
-                  <svg v-else viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M4 16c0 .88.39 1.67 1 2.22V20c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h8v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1.78c.61-.55 1-1.34 1-2.22V6c0-3.5-3.58-4-8-4s-8 .5-8 4v10zm3.5 1c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm9 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6H6V6h12v5z"/>
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
                   </svg>
                 </div>
                 <div class="suggestion-content">
                   <div class="suggestion-name">{{ stop.name }}</div>
-                  <div class="suggestion-lines">
-                    <span v-for="line in stop.lines.slice(0, 5)" :key="line" class="line-badge">{{ line }}</span>
-                    <span v-if="stop.lines.length > 5" class="more-lines">+{{ stop.lines.length - 5 }}</span>
-                  </div>
                 </div>
               </div>
             </div>
@@ -92,8 +88,9 @@
             </svg>
             {{ selectedTime }}
           </button>
-          <button @click="searchRoute" class="search-btn">
-            Szukaj połączenia
+          <button @click="searchRoute" class="search-btn" :disabled="isSearching">
+            <span v-if="isSearching">Szukanie...</span>
+            <span v-else>Szukaj połączenia</span>
           </button>
         </div>
 
@@ -127,8 +124,8 @@
             <div class="stop-marker start-marker">A</div>
             <div>
               <div class="stop-name">{{ selectedFromStop.name }}</div>
-              <div class="stop-lines">
-                <span v-for="line in selectedFromStop.lines.slice(0, 3)" :key="line" class="line-mini-badge">{{ line }}</span>
+              <div v-if="selectedFromStop.shortName && selectedFromStop.shortName !== selectedFromStop.name" class="stop-short">
+                {{ selectedFromStop.shortName }}
               </div>
             </div>
           </div>
@@ -139,8 +136,8 @@
             <div class="stop-marker end-marker">B</div>
             <div>
               <div class="stop-name">{{ selectedToStop.name }}</div>
-              <div class="stop-lines">
-                <span v-for="line in selectedToStop.lines.slice(0, 3)" :key="line" class="line-mini-badge">{{ line }}</span>
+              <div v-if="selectedToStop.shortName && selectedToStop.shortName !== selectedToStop.name" class="stop-short">
+                {{ selectedToStop.shortName }}
               </div>
             </div>
           </div>
@@ -150,7 +147,22 @@
 
     <!-- Результаты поиска маршрутов -->
     <div v-if="!showMapView || !routeResults.length" class="routes-container">
-      <div v-if="!routeResults.length" class="no-results">
+      <!-- Индикатор загрузки -->
+      <div v-if="isSearching" class="searching-state">
+        <div class="spinner"></div>
+        <h3>Szukanie najlepszych połączeń...</h3>
+        <p>Sprawdzamy wszystkie dostępne linie transportu</p>
+      </div>
+      
+      <!-- Нет результатов после поиска -->
+      <div v-else-if="!routeResults.length && selectedFromStop && selectedToStop" class="no-results">
+        <div class="no-results-icon">😔</div>
+        <h3>Nie znaleziono bezpośrednich połączeń</h3>
+        <p>Spróbuj wybrać inne przystanki lub skorzystaj z przesiadki</p>
+      </div>
+      
+      <!-- Начальное состояние -->
+      <div v-else-if="!routeResults.length" class="no-results">
         <div class="no-results-icon">🚌</div>
         <h3>Zaplanuj swoją podróż</h3>
         <p>Wpisz punkt początkowy i docelowy, aby znaleźć najlepsze połączenie</p>
@@ -171,37 +183,27 @@
           </div>
 
           <div class="route-header">
-            <div class="route-time">
-              <span class="departure">{{ route.departure }}</span>
-              <div class="time-arrow">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                  <polyline points="12 5 19 12 12 19"></polyline>
-                </svg>
-              </div>
-              <span class="arrival">{{ route.arrival }}</span>
+            <div class="route-time-left">
+              {{ getTimeUntilDeparture(route.departure) }}
             </div>
-            <div class="route-duration">{{ route.totalDuration }} min</div>
+            <div class="route-times-small">
+              <span>{{ route.departure }}</span>
+              <span>—</span>
+              <span>{{ route.arrival }}</span>
+            </div>
           </div>
 
           <div class="route-details">
-            <div class="route-transfers">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="17 1 21 5 17 9"></polyline>
-                <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
-                <polyline points="7 23 3 19 7 15"></polyline>
-                <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
-              </svg>
-              <span>{{ route.transfers === 0 ? 'Bez przesiadek' : `${route.transfers} ${route.transfers === 1 ? 'przesiadka' : 'przesiadki'}` }}</span>
+            <div class="route-duration-text">
+              {{ route.totalDuration }} min w drodze
             </div>
             <div class="route-steps-preview">
               <div 
                 v-for="(step, idx) in route.steps.filter(s => s.type !== 'walk')" 
                 :key="idx"
-                :class="['transport-badge', step.type]"
+                class="transport-badge-simple"
               >
-                <span v-if="step.line">{{ step.line }}</span>
-                <span v-else class="transport-icon">🚶</span>
+                {{ step.line }}
               </div>
             </div>
           </div>
@@ -438,8 +440,15 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { mockDisruptions, type Disruption } from '../data/mockData'
-import { mockRouteResults, type RouteOption, mockStops, type Stop } from '../data/routesData'
+import { type RouteOption, type Stop } from '../data/routesData'
 import DisruptionDetails from '../components/DisruptionDetails.vue'
+
+interface ApiStop {
+  id: string
+  name: string
+  shortName: string
+  category: string
+}
 
 const fromLocation = ref('')
 const toLocation = ref('')
@@ -450,12 +459,15 @@ const showTimeSelector = ref(false)
 const showMapView = ref(false)
 const selectedDisruption = ref<Disruption | null>(null)
 const selectedRoute = ref<RouteOption | null>(null)
-const selectedFromStop = ref<Stop | null>(null)
-const selectedToStop = ref<Stop | null>(null)
+const selectedFromStop = ref<ApiStop | null>(null)
+const selectedToStop = ref<ApiStop | null>(null)
 const selectedTimeValue = ref('now')
 const routeResults = ref<RouteOption[]>([])
-const fromSuggestions = ref<Stop[]>([])
-const toSuggestions = ref<Stop[]>([])
+const fromSuggestions = ref<ApiStop[]>([])
+const toSuggestions = ref<ApiStop[]>([])
+const isSearching = ref(false)
+const isLoadingFrom = ref(false)
+const isLoadingTo = ref(false)
 
 const timeOptions = [
   { label: 'Teraz', value: 'now' },
@@ -476,46 +488,398 @@ const selectTime = (option: typeof timeOptions[0]) => {
   showTimeSelector.value = false
 }
 
+// Извлечение короткого названия остановки (только номер или первое слово)
+const getShortStopName = (fullName: string) => {
+  // Примеры:
+  // "52 OS.PIASTÓW przez Kalwaryjską" -> "52"
+  // "Dworzec Główny" -> "Dworzec Główny" (если нет номера)
+  const parts = fullName.split(' ')
+  const firstPart = parts[0]
+  
+  // Если первая часть - число или номер с точкой (52, 52.)
+  if (/^\d+\.?$/.test(firstPart)) {
+    return firstPart.replace('.', '')
+  }
+  
+  // Иначе возвращаем полное название
+  return fullName
+}
+
+// Извлечение номера линии (например "Linia 3" -> "3", "50" -> "50")
+const getLineNumber = (lineName: string) => {
+  if (!lineName) return ''
+  
+  // Если это уже число, возвращаем как есть
+  if (/^\d+$/.test(lineName)) {
+    return lineName
+  }
+  
+  // Ищем первое число в строке (например "Linia 3" -> "3")
+  const match = lineName.match(/\d+/)
+  return match ? match[0] : lineName
+}
+
+// API поиск остановок
+const searchStops = async (query: string): Promise<ApiStop[]> => {
+  try {
+    // Используем POST запрос к autocomplete API
+    const formData = new URLSearchParams()
+    formData.append('query', query)
+    formData.append('language', 'pl')
+    
+    const response = await fetch('/api/autocomplete', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: formData.toString()
+    })
+    
+    if (!response.ok) {
+      throw new Error('API request failed')
+    }
+    
+    const html = await response.text()
+    
+    const parser = new DOMParser()
+    const doc = parser.parseFromString(html, 'text/html')
+    const liElements = doc.querySelectorAll('li[stop]')
+    
+    const stops: ApiStop[] = []
+    liElements.forEach((li) => {
+      const stopId = li.getAttribute('stop')
+      const stopName = li.textContent?.trim()
+      
+      if (stopId && stopName) {
+        stops.push({
+          id: stopId,
+          name: stopName,
+          shortName: stopId,
+          category: 'stop'
+        })
+      }
+    })
+    
+    return stops.slice(0, 10) // Ограничиваем 10 результатами
+  } catch (error) {
+    console.error('Error fetching stops:', error)
+    return []
+  }
+}
+
 // Фильтрация подсказок для "Откуда"
-const filterFromSuggestions = () => {
+const filterFromSuggestions = async () => {
   if (fromLocation.value.length < 2) {
     fromSuggestions.value = []
     return
   }
   
-  const query = fromLocation.value.toLowerCase()
-  fromSuggestions.value = mockStops.filter(stop => 
-    stop.name.toLowerCase().includes(query)
-  ).slice(0, 8)
+  isLoadingFrom.value = true
+  try {
+    const stops = await searchStops(fromLocation.value)
+    fromSuggestions.value = stops
+  } finally {
+    isLoadingFrom.value = false
+  }
 }
 
 // Фильтрация подсказок для "Куда"
-const filterToSuggestions = () => {
+const filterToSuggestions = async () => {
   if (toLocation.value.length < 2) {
     toSuggestions.value = []
     return
   }
   
-  const query = toLocation.value.toLowerCase()
-  toSuggestions.value = mockStops.filter(stop => 
-    stop.name.toLowerCase().includes(query)
-  ).slice(0, 8)
+  isLoadingTo.value = true
+  try {
+    const stops = await searchStops(toLocation.value)
+    toSuggestions.value = stops
+  } finally {
+    isLoadingTo.value = false
+  }
+}
+
+// Загрузка деталей остановки по ID
+const fetchStopDetails = async (stopId: string) => {
+  try {
+    // POST запрос с номером остановки
+    const formData = new URLSearchParams()
+    formData.append('stop', stopId)
+    formData.append('language', 'pl')
+    
+    const response = await fetch('/api/stopInfo', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+      },
+      body: formData.toString()
+    })
+    
+    if (!response.ok) {
+      console.warn('Failed to fetch stop details for', stopId)
+      return null
+    }
+    
+    const data = await response.json()
+    console.log('📍 Stop details:', data)
+    return data
+  } catch (error) {
+    console.error('Error fetching stop details:', error)
+    return null
+  }
+}
+
+// Загрузка информации о транспорте (vehicles)
+const fetchVehicles = async (silent: boolean = false) => {
+  try {
+    const formData = new URLSearchParams()
+    formData.append('language', 'pl')
+    formData.append('lastUpdate', Date.now().toString())
+    formData.append('positionType', 'CORRECTED')
+    formData.append('colorType', 'ROUTE_BASED')
+    
+    if (!silent) {
+      console.log('🚌 Запрос транспорта:', {
+        url: '/api/vehicles',
+        method: 'POST',
+        params: {
+          language: 'pl',
+          lastUpdate: Date.now(),
+          positionType: 'CORRECTED',
+          colorType: 'ROUTE_BASED'
+        }
+      })
+    }
+    
+    const response = await fetch('/api/vehicles', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+      },
+      body: formData.toString()
+    })
+    
+    if (!response.ok) {
+      if (!silent) console.error('Failed to fetch vehicles, status:', response.status)
+      return null
+    }
+    
+    const data = await response.json()
+    if (!silent) {
+      console.log('🚌 Ответ - транспорт:', data)
+      console.log('🚌 Количество транспорта:', data?.vehicles?.length || 0)
+    }
+    return data
+  } catch (error) {
+    if (!silent) console.error('Error fetching vehicles:', error)
+    return null
+  }
+}
+
+// Загрузка информации о рейсах (tripPassages)
+const fetchTripPassages = async (tripId: string, vehicleId: string = '', silent: boolean = false) => {
+  try {
+    const formData = new URLSearchParams()
+    formData.append('tripId', tripId)
+    formData.append('mode', 'departure')
+    formData.append('vehicleId', vehicleId)
+    formData.append('language', 'pl')
+    formData.append('cacheBuster', Date.now().toString())
+    
+    // Выводим лог только если не silent режим
+    if (!silent) {
+      console.log('🚂 Запрос рейсов:', {
+        url: '/api/tripPassages',
+        method: 'POST',
+        params: {
+          tripId,
+          mode: 'departure',
+          vehicleId,
+          language: 'pl',
+          cacheBuster: Date.now()
+        }
+      })
+    }
+    
+    const response = await fetch('/api/tripPassages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+      },
+      body: formData.toString()
+    })
+    
+    if (!response.ok) {
+      if (!silent) console.error('Failed to fetch trip passages, status:', response.status)
+      return null
+    }
+    
+    const data = await response.json()
+    
+    // Выводим детали только если не silent режим
+    if (!silent && data.actual && data.actual.length > 0) {
+      console.log('🚂 Ответ - рейсы:', data)
+      console.log('🚂 Остановки на маршруте:', data.actual.length)
+      console.log('🚂 Первая остановка:', data.actual[0].stop?.name)
+      console.log('🚂 Последняя остановка:', data.actual[data.actual.length - 1].stop?.name)
+    }
+    
+    return data
+  } catch (error) {
+    if (!silent) console.error('Error fetching trip passages:', error)
+    return null
+  }
+}
+
+// Поиск маршрута между двумя остановками
+const findRoutesBetweenStops = async (fromStopName: string, toStopName: string) => {
+  console.log('🔍 ПОИСК МАРШРУТА')
+  console.log('   От остановки:', fromStopName, '→', getShortStopName(fromStopName))
+  console.log('   До остановки:', toStopName, '→', getShortStopName(toStopName))
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+  
+  // 1. Получаем все транспортные средства (silent режим для поиска)
+  const vehiclesData = await fetchVehicles(true)
+  if (!vehiclesData?.vehicles) {
+    console.log('❌ Не удалось получить список транспорта')
+    return []
+  }
+  
+  console.log(`🚌 Всего транспорта для проверки: ${vehiclesData.vehicles.length}`)
+  console.log('⏳ Начинаем проверку всех маршрутов...')
+  console.log('💡 Это может занять некоторое время (~' + Math.ceil(vehiclesData.vehicles.length * 0.05) + ' секунд)')
+  console.log('')
+  
+  const foundRoutes: any[] = []
+  let checkedCount = 0
+  
+  // 2. Проверяем ВСЕ транспортные средства
+  for (const vehicle of vehiclesData.vehicles) {
+    checkedCount++
+    
+    // Показываем прогресс каждые 50 проверок
+    if (checkedCount % 50 === 0) {
+      console.log(`⏳ Проверено ${checkedCount}/${vehiclesData.vehicles.length} транспортных средств...`)
+    }
+    
+    // Используем silent режим для массовой проверки
+    const tripData = await fetchTripPassages(vehicle.tripId, vehicle.id, true)
+    
+    if (tripData?.actual) {
+      let fromIndex = -1
+      let toIndex = -1
+      
+      // Получаем короткие названия для сравнения
+      const shortFromName = getShortStopName(fromStopName)
+      const shortToName = getShortStopName(toStopName)
+      
+      // Ищем обе остановки в маршруте по КОРОТКОМУ НАЗВАНИЮ
+      tripData.actual.forEach((passage: any, index: number) => {
+        const stopName = passage.stop?.name
+        if (stopName) {
+          const shortStopName = getShortStopName(stopName)
+          if (shortStopName === shortFromName) fromIndex = index
+          if (shortStopName === shortToName) toIndex = index
+        }
+      })
+      
+      // Если обе остановки найдены и "от" раньше "до"
+      if (fromIndex !== -1 && toIndex !== -1 && fromIndex < toIndex) {
+        const lineName = vehicle.name || vehicle.category
+        const route = {
+          line: getLineNumber(lineName), // Сокращаем до номера
+          category: vehicle.category,
+          fromStop: tripData.actual[fromIndex].stop?.name,
+          toStop: tripData.actual[toIndex].stop?.name,
+          stopsCount: toIndex - fromIndex,
+          departureTime: tripData.actual[fromIndex].actualTime || tripData.actual[fromIndex].plannedTime,
+          arrivalTime: tripData.actual[toIndex].actualTime || tripData.actual[toIndex].plannedTime,
+          vehicleId: vehicle.id,
+          allStops: tripData.actual.slice(fromIndex, toIndex + 1).map((p: any) => ({
+            name: p.stop?.name,
+            time: p.actualTime || p.plannedTime
+          }))
+        }
+        
+        foundRoutes.push(route)
+        
+        console.log('✅ НАЙДЕН МАРШРУТ!')
+        console.log('   🚍 Линия:', route.line)
+        console.log('   📍 От:', route.fromStop)
+        console.log('   📍 До:', route.toStop)
+        console.log('   ⏱️  Отправление:', route.departureTime)
+        console.log('   ⏱️  Прибытие:', route.arrivalTime)
+        console.log('   🛑 Остановок в пути:', route.stopsCount)
+        console.log('   📋 Все остановки:', route.allStops.map((s: any) => s.name).join(' → '))
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      }
+    }
+    
+    // Небольшая задержка чтобы не перегрузить API (50ms между запросами)
+    await new Promise(resolve => setTimeout(resolve, 50))
+  }
+  
+  console.log(`✅ Проверка завершена! Проверено ${checkedCount} транспортных средств`)
+  console.log('')
+  
+  if (foundRoutes.length === 0) {
+    console.log('❌ Прямых маршрутов не найдено')
+    console.log('💡 Возможные причины:')
+    console.log('   - Остановки не связаны прямым маршрутом')
+    console.log('   - Требуется пересадка')
+    console.log('   - Неправильные названия остановок')
+  } else {
+    // Убираем дубликаты по линии и времени отправления
+    const uniqueRoutes = foundRoutes.filter((route, index, self) =>
+      index === self.findIndex((r) => 
+        r.line === route.line && r.departureTime === route.departureTime
+      )
+    )
+    
+    // Сортируем по времени отправления (самые ближайшие первые)
+    const sortedRoutes = uniqueRoutes.sort((a, b) => {
+      const [hoursA, minutesA] = a.departureTime.split(':').map(Number)
+      const [hoursB, minutesB] = b.departureTime.split(':').map(Number)
+      
+      const timeA = hoursA * 60 + minutesA
+      const timeB = hoursB * 60 + minutesB
+      
+      return timeA - timeB
+    })
+    
+    console.log(`🎉 ИТОГО НАЙДЕНО: ${foundRoutes.length} вариант(ов)`)
+    console.log(`📋 Уникальных: ${uniqueRoutes.length}`)
+    console.log(`📊 Отсортировано по времени отправления`)
+    
+    return sortedRoutes
+  }
+  
+  return foundRoutes
 }
 
 // Выбор остановки "Откуда"
-const selectFromStop = (stop: Stop) => {
+const selectFromStop = (stop: ApiStop) => {
   selectedFromStop.value = stop
   fromLocation.value = stop.name
   showFromSuggestions.value = false
   fromSuggestions.value = []
+  
+  console.log('📍 Выбрана начальная остановка:', stop.name)
 }
 
 // Выбор остановки "Куда"
-const selectToStop = (stop: Stop) => {
+const selectToStop = (stop: ApiStop) => {
   selectedToStop.value = stop
   toLocation.value = stop.name
   showToSuggestions.value = false
   toSuggestions.value = []
+  
+  console.log('📍 Выбрана конечная остановка:', stop.name)
+  
+  // Уведомляем пользователя
+  if (selectedFromStop.value && selectedToStop.value) {
+    console.log('✅ Обе остановки выбраны! Нажмите кнопку поиска.')
+  }
 }
 
 // Скрыть подсказки с задержкой
@@ -531,16 +895,77 @@ const hideToSuggestions = () => {
   }, 200)
 }
 
-const searchRoute = () => {
-  if (fromLocation.value && toLocation.value) {
-    console.log('Szukanie trasy:', {
+const searchRoute = async () => {
+  if (!selectedFromStop.value || !selectedToStop.value) {
+    console.warn('⚠️ Wybierz obie przystanki!')
+    return
+  }
+  
+  try {
+    isSearching.value = true
+    console.log('🔍 Szukanie trasy:', {
       from: fromLocation.value,
       to: toLocation.value,
       time: selectedTimeValue.value
     })
-    // Загружаем результаты поиска
-    routeResults.value = mockRouteResults
+    
+    // Очищаем предыдущие результаты
+    routeResults.value = []
     showMapView.value = false
+    
+    // Ищем реальные маршруты по названиям остановок
+    const foundRoutes = await findRoutesBetweenStops(
+      selectedFromStop.value.name, 
+      selectedToStop.value.name
+    )
+    
+    // Преобразуем в формат RouteOption
+    const routeOptions = foundRoutes.map((route, index) => {
+      // Вычисляем общее время в минутах
+      const depTime = route.departureTime?.split(':') || ['0', '0']
+      const arrTime = route.arrivalTime?.split(':') || ['0', '0']
+      const depMinutes = parseInt(depTime[0]) * 60 + parseInt(depTime[1])
+      const arrMinutes = parseInt(arrTime[0]) * 60 + parseInt(arrTime[1])
+      let totalDuration = arrMinutes - depMinutes
+      if (totalDuration < 0) totalDuration += 24 * 60 // через полночь
+      
+      return {
+        id: index + 1,
+        totalDuration,
+        transfers: 0, // прямой маршрут, без пересадок
+        departure: route.departureTime || '00:00',
+        arrival: route.arrivalTime || '00:00',
+        recommended: false, // установим позже
+        steps: [
+          {
+            type: route.category === 'tram' ? 'tram' : 'bus',
+            line: route.line,
+            from: route.fromStop,
+            to: route.toStop,
+            departure: route.departureTime || '00:00',
+            arrival: route.arrivalTime || '00:00',
+            duration: totalDuration,
+            stops: route.stopsCount
+          }
+        ]
+      }
+    })
+    
+    // Находим самый быстрый маршрут
+    if (routeOptions.length > 0) {
+      const fastestRoute = routeOptions.reduce((min, route) => 
+        route.totalDuration < min.totalDuration ? route : min
+      )
+      fastestRoute.recommended = true
+    }
+    
+    routeResults.value = routeOptions
+    
+    console.log(`✅ Pokazano ${routeResults.value.length} маршрутов`)
+  } catch (error) {
+    console.error('❌ Błąd podczas wyszukiwania:', error)
+  } finally {
+    isSearching.value = false
   }
 }
 
@@ -550,6 +975,30 @@ const selectRoute = (route: RouteOption) => {
 
 const selectDisruption = (disruption: Disruption) => {
   selectedDisruption.value = disruption
+}
+
+// Вычисление времени до отправления
+const getTimeUntilDeparture = (departureTime: string) => {
+  const now = new Date()
+  const [hours, minutes] = departureTime.split(':').map(Number)
+  
+  const departure = new Date()
+  departure.setHours(hours, minutes, 0, 0)
+  
+  const diff = departure.getTime() - now.getTime()
+  const diffMinutes = Math.floor(diff / 60000)
+  
+  if (diffMinutes < 0) {
+    return 'Odjechał'
+  } else if (diffMinutes === 0) {
+    return 'Teraz'
+  } else if (diffMinutes < 60) {
+    return `${diffMinutes} min`
+  } else {
+    const hours = Math.floor(diffMinutes / 60)
+    const mins = diffMinutes % 60
+    return mins > 0 ? `${hours}h ${mins}min` : `${hours}h`
+  }
 }
 
 const reportForm = ref({
@@ -678,27 +1127,36 @@ const submitReport = () => {
   font-size: 0.875rem;
   font-weight: 600;
   color: #111827;
-  margin-bottom: 0.25rem;
 }
 
-.suggestion-lines {
+.suggestion-short {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 0.125rem;
+}
+
+.suggestion-loading {
   display: flex;
-  gap: 0.25rem;
-  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  justify-content: center;
+  color: #6b7280;
 }
 
-.line-badge {
-  padding: 0.125rem 0.375rem;
-  background: #e5e7eb;
-  color: #374151;
-  border-radius: 0.25rem;
-  font-size: 0.625rem;
-  font-weight: 700;
+.loader {
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid #e5e7eb;
+  border-top-color: #2563eb;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
 }
 
-.more-lines {
-  font-size: 0.625rem;
-  color: #9ca3af;
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .search-input {
@@ -772,6 +1230,18 @@ const submitReport = () => {
 
 .search-btn:active {
   transform: translateY(0);
+}
+
+.search-btn:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.search-btn:disabled:hover {
+  background: #9ca3af;
+  transform: none;
 }
 
 .map-toggle-btn {
@@ -926,6 +1396,43 @@ const submitReport = () => {
   font-size: 0.875rem;
 }
 
+.searching-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+.searching-state h3 {
+  margin: 1rem 0 0.5rem 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #374151;
+}
+
+.searching-state p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #e5e7eb;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .routes-list {
   display: flex;
   flex-direction: column;
@@ -975,33 +1482,27 @@ const submitReport = () => {
 
 .route-header {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 0.25rem;
   margin-bottom: 0.75rem;
 }
 
-.route-time {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 1.125rem;
+.route-time-left {
+  font-size: 1.5rem;
   font-weight: 700;
   color: #111827;
 }
 
-.time-arrow {
-  color: #9ca3af;
+.route-times-small {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #6b7280;
 }
 
-.time-arrow svg {
-  width: 1rem;
-  height: 1rem;
-}
-
-.route-duration {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #2563eb;
+.route-times-small span {
+  font-weight: 500;
 }
 
 .route-details {
@@ -1011,23 +1512,25 @@ const submitReport = () => {
   gap: 1rem;
 }
 
-.route-transfers {
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
+.route-duration-text {
   font-size: 0.875rem;
   color: #6b7280;
-}
-
-.route-transfers svg {
-  width: 1rem;
-  height: 1rem;
+  font-weight: 500;
 }
 
 .route-steps-preview {
   display: flex;
-  gap: 0.375rem;
+  gap: 0.5rem;
   flex-wrap: wrap;
+}
+
+.transport-badge-simple {
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111827;
+  background: #e5e7eb;
 }
 
 .transport-badge {
@@ -1589,23 +2092,12 @@ const submitReport = () => {
   font-size: 0.875rem;
   font-weight: 700;
   color: #111827;
-  margin-bottom: 0.25rem;
 }
 
-.stop-lines {
-  display: flex;
-  gap: 0.25rem;
-  flex-wrap: wrap;
-}
-
-.line-mini-badge {
-  padding: 0.125rem 0.375rem;
-  background: white;
-  border: 1px solid #e5e7eb;
-  color: #374151;
-  border-radius: 0.25rem;
-  font-size: 0.625rem;
-  font-weight: 700;
+.stop-short {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
 }
 
 .route-line {
